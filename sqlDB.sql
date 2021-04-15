@@ -155,4 +155,51 @@ WHERE height IN (SELECT height
                     FROM userTBL 
                     WHERE addr = '경남');
                     
-                    
+SELECT userNAME, mdate
+FROM userTBL
+ORDER BY mDATE;
+-- 기본 정렬은 오름차순으로 정렬된다.
+SELECT userNAME, mdate
+FROM userTBL
+ORDER BY mDATE ASC;
+-- ASC는 오름차순을 의미한다.
+SELECT userNAME, mdate
+FROM userTBL
+ORDER BY mDATE DESC;
+-- DESC은 내림차순을 의미한다.
+SELECT userNAME, mdate
+FROM userTBL
+ORDER BY mDATE;
+
+SELECT userNAME, height
+FROM userTBL
+ORDER BY height DESC, username ASC;
+-- 키를 기준으로 큰 순서대로 내림차순으로 정리하고 키가 같은 자료가 있으면 이름을 오름차순으로 정렬한다.
+
+SELECT username, height 
+FROM usertbl 
+WHERE height >= 170 AND addr = '서울' 
+ORDER BY height DESC;
+-- ORDER BY 절은 SELECT, FROM, WHERE, GROUP BY, HAVING의 뒤에 나와야 한다.
+
+
+SELECT ADDR
+FROM USERTBL
+ORDER BY ADDR;
+-- 10명의 회원의 지역을 확인
+SELECT DISTINCT ADDR
+FROM USERTBL
+ORDER BY ADDR;
+-- 중복을 제외한 뒤 출력
+
+
+CREATE TABLE BUYTBL2 AS(SELECT * FROM buytbl);
+SELECT * FROM buytbl;
+SELECT * FROM buytbl2;
+-- BUYTBL을 전부 BUYTBL2를 만들면서 복사한 것이다.
+-- 이때, 복사한 BUYTBL2에는 PK와 FK 등 제약조건은 복사되지 않는다.
+-- 테이블의 내용을 간단히 사용하고자 할 때 주로 쓴다.
+
+CREATE TABLE BUYTBL3 AS(SELECT useid, prodname FROM buytbl);
+-- BUYTBL의 USERID열과 PRODNAME열만 복사해서 BUYTBL3에 넣어주면서 생성한다.
+SELECT * FROM buytbl3;
