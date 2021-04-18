@@ -98,9 +98,11 @@ WHERE userNAME LIKE '_종신';
 
 
 
-- ANY/ALL/SOME 그리고 서브쿼리(SubQuery, 하위커리)
+#### ANY/ALL/SOME 그리고 서브쿼리(SubQuery, 하위커리)
 
-> 쿼리문 안의 쿼리문
+- 서브쿼리
+
+> 서브쿼리: 쿼리문 안의 쿼리문
 
 ``` sql
 SELECT userNAME, height 
@@ -114,8 +116,109 @@ WHERE height > (SELECT height
                 WHERE userNAME = '김경호');
 -- 위의 177처럼 고정된 값이 아니라 표본을 이용하여 뽑아주고자 할 때
 -- 키가 177인 김경호를 불러와서 표본으로 비교하였다.
-
+SELECT userNAME, height 
+FROM userTBL 
+WHERE height >= (SELECT height 
+                FROM userTBL 
+                WHERE addr = '경남');
+-- 위처럼 표본이 여러개가 나오는 경우에는 오류가 발생한다.
+-- 왜냐하면, 서브쿼리에서 두개이상의 값을 반환할 때는 어떤 값을 기준으로 할 것인지 명확하지 않기때문이다.
 ```
 
 
 
+- ANY/SOME
+
+> 조건에 만족하는 모든 자료를 출력하도록 해준다. => 둘 이상의 반환값 중 어느 하나에라도 만족하는 것.
+
+``` sql
+SELECT rownum, userNAME, height
+FROM userTBL
+WHERE height >= ANY (SELECT height 
+                	FROM userTBL 
+                	WHERE addr = '경남');
+-- 주소가 '경남'인 유저의 키를 표본으로 이보다 크거나 같은 모든 자료를 가져오고자 한다. / 이때, SOME은 ANY와 완전히 같은 의미로 사용된다.
+SELECT rownum, userNAME, height
+FROM userTBL
+WHERE height = ANY (SELECT height 
+                	FROM userTBL 
+                	WHERE addr = '경남');
+-- 위는 주소가 '경남'인 유저의 키와 같은 자료만 출력하는 것인데, 이때의 '=ANY()'는 'IN()'과 같은 의미로 사용한다.
+-- 위,아래의 쿼리문은 같은 의미이다.
+SELECT rownum, userNAME, height
+FROM userTBL
+WHERE height IN (SELECT height 
+                	FROM userTBL 
+                	WHERE addr = '경남');
+```
+
+
+
+- ALL
+
+> 모든 조건에 만족하는 자료만 출력하도록 해준다. => 둘 이상의 반환값을 모두 만족시키는 것.
+
+``` sql
+SELECT rownum, userNAME, height
+FROM userTBL
+WHERE height >= ALL (SELECT height 
+                	FROM userTBL 
+                	WHERE addr = '경남');
+-- 모든 조건을 만족하기 위해서, 주소가 '경남'인 유저 중 제일 키가 큰사람의 키보다 크거나 같은 사람을 출력하도록 한다.
+```
+
+
+
+- ORDER BY
+
+> 결과물에 대해 영향을  미치지 않지만, 결과가 출력되는 순서를 정한다. 기본값(디폴트 값)은 ASC로 오름차순 정렬이다. / DESC은 내림차순을 의미한다.
+
+``` SQL
+SELECT userNAME, mDATE
+FROM userTBL
+ORDER BY mDATE; -- ORDER BY mDATE ASC;와 같다 디폴트값이 ASC이다.
+-- mDATE(가입일)을 기준으로 유저이름과 가입일을 오름차순 정렬(먼저 가입한 순서)로 출력한다.
+SELECT userNAME, mDATE
+FROM userTBL
+ORDER BY mDATE DSEC;
+-- mDATE(가입일)을 기준으로 유저이름과 가입일을 내림차순 정렬(나중에 가입한 순서)로 출력한다.
+SELECT userNAME, height
+FROM userTBL
+ORDER BY height DESC, userNAME ASC;
+-- 두 개의 기준으로 정렬을 하는 구문이다. 앞에 나와있는 height의 영향으로 키를 우선으로 내림차순 정렬을 하고 키가 같은 사람들끼리는 이름을 기준으로 오름차순으로 정렬한다.
+```
+
+> ORDER BY 절은 SELECT, FROM, WHERE, GROUP BY, HAVING의 뒤에 나와야 한다.
+
+
+
+- DISTINCT
+
+> 출력하고자 하는 자료에서 중복을 제외하고 보여준다.
+
+``` sql
+SELECT ADDR
+FROM USERTBL
+ORDER BY ADDR;
+-- 위 구문으로 경기, 경기, 경남, 경남, 경북, 서울, 서울, 서울, 서울, 전남이 출력됐다고 했을 때,
+SELECT DISTINCT ADDR
+FROM USERTBL
+ORDER BY ADDR;
+-- SQL문을 출력하면 중복을 제외하여 경기, 경남, 경북, 서울, 전남이 출력된다.
+```
+
+
+
+- CREATE TABLE --- AS SELECT ---
+
+> 테이블을 복사해서 사용할 때 주로 사용되는 쿼리문이다. SELECT절로 출력된 자료들로 새로운 테이블을 생성한다.
+
+``` sql
+CREATE TABLE BUYTBL2 AS(SELECT * FROM buytbl);
+-- buytbl의 모든 자료를 바탕으로 BUYTBL2를 생성한다.
+CREATE TABLE BUYTBL3 AS(SELECT useid, prodname 
+                        FROM buytbl);
+-- buytbl의 useid와 prodname의 자료를 가지고 BUYTBL3를 생성한다.
+```
+
+> 이렇게 복사 된 테이블은 PK(기본키)와 FK(외래키) 등의 제약조건은 복사되지 않는다. 
