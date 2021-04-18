@@ -79,6 +79,8 @@ WHERE addr IN('경남','전남','경북');
 
 - LIKE
 
+> 문자열의 내용을 검색하고자 할 때
+
 ``` SQL
 SELECT userNAME, height
 FROM userTBL
@@ -93,4 +95,27 @@ WHERE userNAME LIKE '_종신';
 -- 단, 선우종신이 있으면 출력하지 못한다.
 -- 반대로 '__종신'으로 언더바가 두개가 있으면, 선우종신의 이름과 키만 출력하고 김종신 윤종신 박종신은 출력하지 못한다.
 ```
+
+
+
+- ANY/ALL/SOME 그리고 서브쿼리(SubQuery, 하위커리)
+
+> 쿼리문 안의 쿼리문
+
+``` sql
+SELECT userNAME, height 
+FROM userTBL 
+WHERE height > 177;
+-- 177 초과된 사람을 뽑아보고자 할 때
+SELECT userNAME, height 
+FROM userTBL 
+WHERE height > (SELECT height 
+                FROM userTBL 
+                WHERE userNAME = '김경호');
+-- 위의 177처럼 고정된 값이 아니라 표본을 이용하여 뽑아주고자 할 때
+-- 키가 177인 김경호를 불러와서 표본으로 비교하였다.
+
+```
+
+
 
